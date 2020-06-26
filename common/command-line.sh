@@ -46,10 +46,10 @@ case $key in
         filename+="-besu"
       fi
     ;;
-    ${INCLUDE_PROJECT_OPTIONS:+--composer})
+    ${INCLUDE_PROJECT_OPTIONS:+--cactus})
       if [[ "$all_specified" == FALSE ]] ; then
-        repositories+=( "${composer_repositories[@]}" )
-        filename+="-composer"
+        repositories+=( "${cactus_repositories[@]}" )
+        filename+="-cello"
       fi
     ;;
     ${INCLUDE_PROJECT_OPTIONS:+--cello})
@@ -124,12 +124,6 @@ case $key in
         filename+="-other"
       fi
     ;;
-    ${INCLUDE_PROJECT_OPTIONS:+--gerrit})
-      if [[ "$all_specified" == FALSE ]] ; then
-        repositories+=( "${gerrit_repositories[@]}" )
-        filename+="-gerrit"
-      fi
-    ;;
     ${INCLUDE_PROJECT_OPTIONS:+--github})
       if [[ "$all_specified" == FALSE ]] ; then
         repositories+=( "${github_repositories[@]}" )
@@ -169,7 +163,7 @@ EOM
           --burrow:   Include Burrow repositories
           --indy:     Include Indy repositories
           --besu:     Include Besu repositories
-          --composer: Include Composer repositories
+          --cactus:   Include Cactus repositories
           --cello:    Include Cello repositories
           --explorer: Include Explorer repositories
           --quilt:    Include Quilt repositories
@@ -182,7 +176,6 @@ EOM
           --projects: Include Project repositories
           --labs:     Include Labs repositories
           --other:    Include Other repositories
-          --gerrit:   Include Gerrit repositories
           --github:   Include Github repositories
           --all:      Include all repositories (default)
 EOM_PROJECT
@@ -227,5 +220,3 @@ then
   repositories="${all_repositories[@]}"
   filename+="-all"
 fi
-
-
