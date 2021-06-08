@@ -20,8 +20,15 @@ script_dir="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 . ${script_dir}/../common/command-line.sh
 
+if [ "$(uname)" == "Darwin" ]; then
+  MD5SUM="md5 -r"
+else
+  MD5SUM="md5sum"
+fi
+
 today=`date -u +%Y-%m-%d-%H-%M-%S`
 outdir="${output_dir}"/${filename}-${today}
+hashdir="${hashjs_dir:-${outdir}}"
 mkdir -p "${outdir}"/working
 
 srcdir=/tmp/${filename}-${today}
@@ -81,6 +88,31 @@ awk 'BEGIN { FS = "|" }
        gsub(/,/,"|",col2)
        print col1 "," col2
      }' "${outdir}"/working/contributors > "${outdir}"/contributors.csv
+
+set -x
+# Generate the hashes.js file
+cat >"${hashdir}"/hashes.js << EOM_HASHJS_PRE
+'use strict';
+
+class Hashes {
+
+  static check(hash) {
+    const hashes = {
+EOM_HASHJS_PRE
+
+for i in $(cut -d , -f 1 "${outdir}"/contributors.csv); do
+  hash=$(echo -n "${i}" | ${MD5SUM} | cut -d ' ' -f 1)
+  echo "      \"${hash}\":\"\"," >> "${hashdir}"/hashes.js
+done
+
+cat >>"${hashdir}"/hashes.js << EOM_HASHJS_POST
+    };
+    return hashes.hasOwnProperty(hash);
+  }
+}
+if (typeof module != 'undefined' && module.exports) module.exports = Hashes;
+EOM_HASHJS_POST
+set +x
 
 echo "since=${since:+${since}} through until=${until:+${until}}" > "${outdir}"/arguments.txt
 
